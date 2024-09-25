@@ -12,9 +12,10 @@ services:
             - '${APP_PORT:-80}:80'
             - '${VITE_PORT:-5173}:${VITE_PORT:-5173}'
         environment:
+            PHP_IDE_CONFIG: "serverName = host.docker.internal"
             WWWUSER: '${WWWUSER}'
             LARAVEL_SAIL: 1
-            XDEBUG_MODE: '${SAIL_XDEBUG_MODE:-off}'
+            XDEBUG_MODE: '${SAIL_XDEBUG_MODE:-xdebug}'
             XDEBUG_CONFIG: '${SAIL_XDEBUG_CONFIG:-client_host=host.docker.internal}'
             IGNITION_LOCAL_SITES_PATH: '${PWD}'
         volumes:
@@ -41,17 +42,17 @@ services:
             - './vendor/laravel/sail/database/pgsql/create-testing-database.sql:/docker-entrypoint-initdb.d/10-create-testing-database.sql'
         networks:
             - sail
-        healthcheck:
-            test:
-                - CMD
-                - pg_isready
-                - '-q'
-                - '-d'
-                - '${DB_DATABASE}'
-                - '-U'
-                - '${DB_USERNAME}'
-            retries: 3
-            timeout: 5s
+#        healthcheck:
+#            test:
+#                - CMD
+#                - pg_isready
+#                - '-q'
+#                - '-d'
+#                - '${DB_DATABASE}'
+#                - '-U'
+#                - '${DB_USERNAME}'
+#            retries: 3
+#            timeout: 5s
     redis:
         image: 'redis:alpine'
         ports:
@@ -60,13 +61,13 @@ services:
             - 'sail-redis:/data'
         networks:
             - sail
-        healthcheck:
-            test:
-                - CMD
-                - redis-cli
-                - ping
-            retries: 3
-            timeout: 5s
+#        healthcheck:
+#            test:
+#                - CMD
+#                - redis-cli
+#                - ping
+#            retries: 3
+#            timeout: 5s
     meilisearch:
         image: 'getmeili/meilisearch:latest'
         ports:
@@ -77,15 +78,15 @@ services:
             - 'sail-meilisearch:/meili_data'
         networks:
             - sail
-        healthcheck:
-            test:
-                - CMD
-                - wget
-                - '--no-verbose'
-                - '--spider'
-                - 'http://127.0.0.1:7700/health'
-            retries: 3
-            timeout: 5s
+#        healthcheck:
+#            test:
+#                - CMD
+#                - wget
+#                - '--no-verbose'
+#                - '--spider'
+#                - 'http://127.0.0.1:7700/health'
+#            retries: 3
+#            timeout: 5s
     mailpit:
         image: 'axllent/mailpit:latest'
         ports:
