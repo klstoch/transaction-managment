@@ -12,7 +12,7 @@ services:
             - '${APP_PORT:-80}:80'
             - '${VITE_PORT:-5173}:${VITE_PORT:-5173}'
         environment:
-            PHP_IDE_CONFIG: "serverName = host.docker.internal"
+            PHP_IDE_CONFIG: "serverName=host.docker.internal"
             WWWUSER: '${WWWUSER}'
             LARAVEL_SAIL: 1
             XDEBUG_MODE: '${SAIL_XDEBUG_MODE:-xdebug}'
