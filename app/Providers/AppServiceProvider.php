@@ -16,9 +16,11 @@ class AppServiceProvider extends ServiceProvider
 
     /**
      * Bootstrap any application services.
+     * @throws RequiredParameterMissedException
      */
     public function boot(): void
     {
-        //
+        $config = config('money');
+        LibConfig::getInstance($config);
     }
 }

@@ -6,10 +6,12 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
+        "ext-http": "*",
         "laravel/framework": "^11.9",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.9",
-        "ext-http": "*"
+        "v.chetkov/data-structures": "@dev",
+        "v.chetkov/money": "0.4"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
@@ -31,6 +33,7 @@
             "Tests\\": "tests/"
         }
     },
+
     "scripts": {
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
