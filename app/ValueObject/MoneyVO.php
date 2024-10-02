@@ -10,6 +10,8 @@ use Chetkov\Money\Money;
 
 final readonly class MoneyVO
 {
+    private const SUPPORTED_CURRENCIES = ['USD', 'EUR', 'RUB'];
+
     private function __construct(
         private Money $money,
     )
@@ -18,6 +20,10 @@ final readonly class MoneyVO
 
     public static function create(float $amount, string $currency): self
     {
+        self::validateAmount($amount);
+
+        self::validateCurrency($currency);
+
         return self::exceptionHandling(function () use ($amount, $currency) {
             $money = new Money($amount, $currency);
             return new self($money);
@@ -39,8 +45,9 @@ final readonly class MoneyVO
         return $this->money->getCurrency();
     }
 
-    public function exchange($toCurrency): self
+    public function exchange(string $toCurrency): self
     {
+        self::validateCurrency($toCurrency);
 
         return $this->exceptionHandling(function () use ($toCurrency) {
             if ($this->money->getCurrency() !== $toCurrency) {
@@ -67,6 +74,20 @@ final readonly class MoneyVO
             return self::createFromMoney($money);
         });
 
+    }
+
+    private static function validateAmount(float $amount): void
+    {
+        if ($amount < 0 ) {
+            throw new \InvalidArgumentException("Сумма должна быть не меньше 0");
+        }
+    }
+
+    private static function validateCurrency(string $currency): void
+    {
+        if (!in_array($currency, self::SUPPORTED_CURRENCIES, true)) {
+            throw new \InvalidArgumentException("Валюта '$currency' не поддерживается.");
+        }
     }
 
     private static function exceptionHandling(callable $callback): mixed

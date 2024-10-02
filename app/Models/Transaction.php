@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Enums\TransactionType;
-use Exception;
+use App\ValueObject\MoneyVO;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use InvalidArgumentException;
+
 
 /**
  * @property int $user_id
@@ -22,73 +22,70 @@ class Transaction extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['user_id', 'type', 'amount', 'recipient_id', 'currency'];
+    protected $fillable = [
+        'user_id',
+        'type',
+        'amount',
+        'recipient_id',
+        'currency'
+    ];
 
     protected $casts = [
         'type' => TransactionType::class,
-        'amount' => 'float',
-        'currency' => 'string',
     ];
 
     public static function createForDeposit(
-        User   $user,
-        float  $amount,
-        string $currency,
+        User    $user,
+        MoneyVO $money,
     ): self
     {
         $transaction = new Transaction();
         $transaction->user_id = $user->id;
         $transaction->type = TransactionType::DEPOSIT;
-        $transaction->setAmount($amount);
-        $transaction->currency = $currency;
+        $transaction->amount = $money->getAmount();
+        $transaction->currency = $money->getCurrency();
         $transaction->recipient_id = $user->id;
+
+//        $transaction->user()->associate($user);
 
         return $transaction;
     }
 
-    /**
-     * @throws Exception
-     */
     public static function createForWithdraw(
         User   $user,
-        float  $amount,
-        string $currency,
+        MoneyVO $money,
     ): self
     {
         $transaction = new Transaction();
         $transaction->user_id = $user->id;
         $transaction->type = TransactionType::WITHDRAW;
-        $transaction->setAmount($amount);
-        $transaction->currency = $currency;
+        $transaction->amount = $money->getAmount();
+        $transaction->currency = $money->getCurrency();
         $transaction->recipient_id = null;
+
+        //$transaction->user()->associate($user);
 
         return $transaction;
     }
 
     public static function createForTransfer(
-        User   $sender,
-        float  $amount,
-        string $currency,
-        User   $recipient,
+        User    $sender,
+        MoneyVO $money,
+        User    $recipient,
     ): self
     {
         $transaction = new Transaction();
         $transaction->user_id = $sender->id;
         $transaction->type = TransactionType::TRANSFER;
-        $transaction->setAmount($amount);
-        $transaction->currency = $currency;
+        $transaction->amount = $money->getAmount();
+        $transaction->currency = $money->getCurrency();
         $transaction->recipient_id = $recipient->id;
+
+        //$transaction->user()->associate($sender);
 
         return $transaction;
     }
 
-    private function setAmount(float $amount): void
-    {
-        if ($amount <= 0) {
-            throw new InvalidArgumentException('Сумма транзакции должна быть больше 0');
-        }
-        $this->amount = $amount;
-    }
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use App\Services\Transaction\TransferService;
-use Exception;
-use http\Exception\InvalidArgumentException;
+use App\Casts\MoneyVOCast;
+use App\ValueObject\MoneyVO;
+use InvalidArgumentException;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -15,10 +15,11 @@ use Laravel\Sanctum\HasApiTokens;
 
 /**
  * @property int $id
- * @property string $name
- * @property string $email
- * @property string $password
- * @property float $balance
+ * @property-read string $name
+ * @property-read string $email
+ * @property-read string $password
+ * @property MoneyVO $balance
+ * @property mixed $transactions
  */
 class User extends Authenticatable
 {
@@ -33,6 +34,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'balance',
         'currency',
     ];
 
@@ -51,71 +53,6 @@ class User extends Authenticatable
         'currency' => 'RUB',
     ];
 
-    public function deposit(float $amount, string $currency): Transaction
-    {
-        $this->validateAmount($amount);
-
-        $transaction = Transaction::createForDeposit($this, $amount, $currency);
-        $this->balance += $amount;
-
-        return $transaction;
-    }
-
-    /**
-     * @throws Exception
-     */
-    public function withdraw(float $amount, string $currency): Transaction
-    {
-        $this->validateAmount($amount);
-        $this->validateBalance($amount);
-
-        $transaction = Transaction::createForWithdraw($this, $amount, $currency);
-        $this->balance -= $amount;
-
-        return $transaction;
-    }
-
-    /**
-     * @throws Exception
-     */
-    public function transfer(User $recipient, float $amount, string $currency): Transaction
-    {
-        $this->validateAmount($amount);
-        $this->validateBalance($amount);
-
-        if ($this->id === $recipient->id) {
-            throw new Exception('Нельзя перевести средства самому себе');
-        }
-
-        $transaction = Transaction::createForTransfer($this, $amount, $currency, $recipient);
-        $this->balance -= $amount;
-        $recipient->balance += $amount;
-
-        return $transaction;
-    }
-
-    private function validateAmount(float $amount): void
-    {
-        if ($amount < 1 || $amount > 100000) {
-            throw new InvalidArgumentException('Сумма транзакции должна быть от 1 до 100000');
-        }
-    }
-
-    /**
-     * @throws Exception
-     */
-    private function validateBalance(float $amount): void
-    {
-        if ($amount > $this->balance) {
-            throw new Exception('Недостаточно средств');
-        }
-    }
-
-    public function transaction(): HasMany
-    {
-        return $this->hasMany(Transaction::class);
-    }
-
     /**
      * Get the attributes that should be cast.
      *
@@ -126,7 +63,87 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
-            'balance' => 'float',
+            'balance' => MoneyVOCast::class,
         ];
+    }
+
+//    public function __construct(
+//        string $name,
+//        string $email,
+//        string $password,
+//        ?MoneyVO $initialBalance = null,
+//    ) {
+//        parent::__construct();
+//
+//        $this->name = $name;
+//        $this->email = $email;
+//        $this->password = password_hash($password, PASSWORD_DEFAULT);
+//        $this->balance = $initialBalance ?? MoneyVO::create(0, 'RUB');
+//
+//    }
+
+    public function deposit(MoneyVO $money): Transaction
+    {
+        $this->validateAmountInDefaultCurrency($money);
+
+        $convertedMoney = $money->exchange($this->balance->getCurrency());
+        $this->balance = $this->balance->add($convertedMoney);
+        return Transaction::createForDeposit($this, $money);
+    }
+
+    public function withdraw(MoneyVO $money): Transaction
+    {
+        $this->validateAmountInDefaultCurrency($money);
+        $this->validateBalance($money);
+
+        $convertedMoney = $money->exchange($this->balance->getCurrency());
+
+        $this->balance = $this->balance->subtract($convertedMoney);
+        return Transaction::createForWithdraw($this, $money);
+    }
+
+    public function transfer(User $recipient, MoneyVO $money): Transaction
+    {
+        $this->validateAmountInDefaultCurrency($money);
+        $this->validateBalance($money);
+
+        if ($this->id === $recipient->id) {
+            throw new InvalidArgumentException('Нельзя перевести средства самому себе');
+        }
+
+        $convertedSenderMoney = $money->exchange($this->balance->getCurrency());
+
+        $this->balance = $this->balance->subtract($convertedSenderMoney);
+
+        $convertedRecipientMoney = $money->exchange($recipient->balance->getCurrency());
+        $recipient->balance = $recipient->balance->add($convertedRecipientMoney);
+
+        return Transaction::createForTransfer($this, $money, $recipient);
+
+    }
+
+    private function validateAmountInDefaultCurrency(MoneyVO $money): void
+    {
+
+        $convertedMoney = $money->exchange($this->balance->getCurrency());
+        $amount = $convertedMoney->getAmount();
+
+        if ($amount < 1 || $amount > 100000) {
+            throw new InvalidArgumentException('Сумма должна быть от 1 до 100000 в RUB');
+        }
+    }
+
+    private function validateBalance(MoneyVO $money): void
+    {
+        $convertedMoney = $money->exchange($this->balance->getCurrency());
+
+        if ($convertedMoney->getAmount() > $this->balance->getAmount()) {
+            throw new InvalidArgumentException('Недостаточно средств');
+        }
+    }
+
+    public function transactions(): HasMany
+    {
+        return $this->hasMany(Transaction::class);
     }
 }
