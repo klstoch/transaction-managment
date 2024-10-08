@@ -10,7 +10,6 @@ use Illuminate\Database\Eloquent\Collection;
 
 class UserRepository implements UserRepositoryInterface
 {
-
     public function save(User $user): bool
     {
         if ($user->save()) {

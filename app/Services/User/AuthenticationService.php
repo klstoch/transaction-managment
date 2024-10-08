@@ -6,23 +6,25 @@ declare(strict_types=1);
 namespace App\Services\User;
 
 use App\Models\User;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\ValidationException;
+use App\Repositories\User\UserRepository;
+use PHPUnit\Event\InvalidArgumentException;
 
 
-class AuthenticationService
+readonly class AuthenticationService
 {
+    public function __construct(private  UserRepository $userRepository)
+    {
+    }
 
-    /**
-     * @throws ValidationException
-     */
     public function login(array $data): string
     {
-        $user = User::query()->where('email', $data['email'])->first();
+        $user = $this->userRepository->findByEmail($data['email']);
 
-        if (!$user || !Hash::check($data['password'], $user->password)) {
-            throw ValidationException::withMessages(['email' => ['Неправильные данные для входа.'],]);
+        if (!$user) {
+            throw new InvalidArgumentException('Неправильные данные для входа.');
         }
+
+        $user->checkPassword($data['password']);
 
         return $user->createToken('auth_token')->plainTextToken;
     }

@@ -26,11 +26,12 @@ class UserTest extends TestCase
         string  $expectedTransactionType,
     ): void
     {
-        $user = new User();
-        $user->name = 'test';
-        $user->email = 'test@test.com';
-        $user->password = 'test';
-        $user->balance = MoneyVO::create($initialBalance, 'RUB');
+        $user = User::create(
+            'test',
+            'test@test.com',
+            'password',
+            MoneyVO::create($initialBalance, 'RUB'),
+        );
         $user->save();
 
         if ($money->getAmount() < 1 || $money->getAmount() > 100000) {
@@ -78,11 +79,12 @@ class UserTest extends TestCase
     ): void
     {
 
-        $user = new User();
-        $user->name = 'test';
-        $user->email = 'test@test.com';
-        $user->password = 'test';
-        $user->balance = MoneyVO::create($initialBalance, 'RUB');
+        $user = User::create(
+            'test',
+            'test@test.com',
+            'password',
+            MoneyVO::create($initialBalance, 'RUB'),
+        );
         $user->save();
 
         if ($money->getAmount() < 1 || $money->getAmount() > 100000 || $user->balance->getAmount() < $money->getAmount()) {
@@ -128,18 +130,20 @@ class UserTest extends TestCase
         bool    $shouldThrowException = false
     ): void
     {
-        $sender = new User();
-        $sender->name = 'test';
-        $sender->email = 'test@test.com';
-        $sender->password = 'test';
-        $sender->balance = MoneyVO::create($initialBalanceSender, 'RUB');
+        $sender = User::create(
+            'test',
+            'test@test.com',
+            'password',
+            MoneyVO::create($initialBalanceSender, 'RUB'),
+        );
         $sender->save();
 
-        $recipient = new User();
-        $recipient->name = 'test_recipient';
-        $recipient->email = 'test@test_recipient.com';
-        $recipient->password = 'test_recipient';
-        $recipient->balance = MoneyVO::create($initialBalanceRecipient, 'RUB');
+        $recipient = User::create(
+            'test_recipient',
+            'test_recipient@test.com',
+            'password_recipient',
+            MoneyVO::create($initialBalanceRecipient, 'RUB'),
+        );
         $recipient->save();
 
         if ($shouldThrowException) {

@@ -23,18 +23,20 @@ class TransactionTest extends TestCase
         $config = require __DIR__ . '/../../../config/money.php';
         LibConfig::getInstance($config);
 
-        $user = new User();
-        $user->name = 'test';
-        $user->email = 'test@test.com';
-        $user->password = 'test';
-        $user->balance = MoneyVO::create(100, 'RUB');
+        $user = User::create(
+            'test',
+            'test@test.com',
+            'password',
+            MoneyVO::create(100, 'RUB'),
+        );
         $user->save();
 
-        $recipient = new User();
-        $recipient->name = 'test_recipient';
-        $recipient->email = 'test@test_recipient.com';
-        $recipient->password = 'test_recipient';
-        $recipient->balance = MoneyVO::create(0, 'RUB');
+        $recipient = User::create(
+            'test_recipient',
+            'test_recipient@test.com',
+            'password_recipient',
+            MoneyVO::create(0, 'RUB'),
+        );
         $recipient->save();
 
         $expectedTransactions = [

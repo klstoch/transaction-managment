@@ -6,6 +6,7 @@ namespace App\Models;
 
 use App\Casts\MoneyVOCast;
 use App\ValueObject\MoneyVO;
+use Illuminate\Support\Facades\Hash;
 use InvalidArgumentException;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -14,11 +15,11 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
 /**
- * @property int $id
+ * @property-read int $id
  * @property-read string $name
  * @property-read string $email
  * @property-read string $password
- * @property MoneyVO $balance
+ * @property-read MoneyVO $balance
  * @property mixed $transactions
  */
 class User extends Authenticatable
@@ -53,6 +54,22 @@ class User extends Authenticatable
         'currency' => 'RUB',
     ];
 
+    public static function create(
+        string $name,
+        string $email,
+        string $password,
+        ?MoneyVO $initialBalance = null,
+    ): self {
+        $user = new self();
+
+        $user->name = $name;
+        $user->email = $email;
+        $user->password = password_hash($password, PASSWORD_DEFAULT);
+        $user->balance = $initialBalance ?? MoneyVO::create(0, 'RUB');
+
+        return $user;
+    }
+
     /**
      * Get the attributes that should be cast.
      *
@@ -62,25 +79,17 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
-            'password' => 'hashed',
             'balance' => MoneyVOCast::class,
         ];
     }
 
-//    public function __construct(
-//        string $name,
-//        string $email,
-//        string $password,
-//        ?MoneyVO $initialBalance = null,
-//    ) {
-//        parent::__construct();
-//
-//        $this->name = $name;
-//        $this->email = $email;
-//        $this->password = password_hash($password, PASSWORD_DEFAULT);
-//        $this->balance = $initialBalance ?? MoneyVO::create(0, 'RUB');
-//
-//    }
+    public function checkPassword(string $password): bool
+    {
+        if (!Hash::check($password, $this->password)) {
+            throw new InvalidArgumentException('Неправильный пароль.');
+        }
+        return true;
+    }
 
     public function deposit(MoneyVO $money): Transaction
     {

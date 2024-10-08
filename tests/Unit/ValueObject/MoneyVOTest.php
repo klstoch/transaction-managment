@@ -11,11 +11,8 @@ use Chetkov\Money\LibConfig;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-//use phpmock\phpunit\PHPMock;
-
 class MoneyVOTest extends TestCase
 {
-//    use PHPMock;
 
     #[DataProvider('exchangeDataProvider')]
     public function testExchange(float $initialAmount, string $initialCurrency, string $toCurrency, float $expectedAmount): void
@@ -47,9 +44,6 @@ class MoneyVOTest extends TestCase
     #[DataProvider('addDataProvider')]
     public function testAdd(float $amount1, string $currency1, float $amount2, string $currency2, float $expectedAmount): void
     {
-//        $validateAmountMock = $this->getFunctionMock('App\ValueObject', 'validateAmount');
-//        $validateAmountMock->expects($this->any())->willReturn(null);
-
         $money1 = MoneyVO::create($amount1, $currency1);
         $money2 = MoneyVO::create($amount2, $currency2);
 
@@ -76,9 +70,6 @@ class MoneyVOTest extends TestCase
             'add_eur_to_rub' => [100, 'RUB', 10, 'EUR', 1140],
             'add_rub_to_usd' => [10, 'USD', 100, 'RUB', 11.1],
             'add_rub_to_eur' => [10, 'EUR', 100, 'RUB', 11],
-//            'positive_add_negative' => [100, 'RUB', -50, 'RUB', 50],
-//            'negative_add_positive' => [-100, 'RUB', 50, 'RUB', -50],
-//            'negative_add_negative' => [-100, 'RUB', -50, 'RUB', -150],
         ];
     }
 
