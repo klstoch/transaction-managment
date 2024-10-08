@@ -40,13 +40,12 @@ class Transaction extends Model
     ): self
     {
         $transaction = new Transaction();
-        $transaction->user_id = $user->id;
         $transaction->type = TransactionType::DEPOSIT;
         $transaction->amount = $money->getAmount();
         $transaction->currency = $money->getCurrency();
         $transaction->recipient_id = $user->id;
 
-//        $transaction->user()->associate($user);
+        $user->addTransaction($transaction);
 
         return $transaction;
     }
@@ -63,7 +62,7 @@ class Transaction extends Model
         $transaction->currency = $money->getCurrency();
         $transaction->recipient_id = null;
 
-        //$transaction->user()->associate($user);
+        $user->addTransaction($transaction);
 
         return $transaction;
     }
@@ -75,13 +74,12 @@ class Transaction extends Model
     ): self
     {
         $transaction = new Transaction();
-        $transaction->user_id = $sender->id;
         $transaction->type = TransactionType::TRANSFER;
         $transaction->amount = $money->getAmount();
         $transaction->currency = $money->getCurrency();
         $transaction->recipient_id = $recipient->id;
 
-        //$transaction->user()->associate($sender);
+        $sender->addTransaction($transaction);
 
         return $transaction;
     }

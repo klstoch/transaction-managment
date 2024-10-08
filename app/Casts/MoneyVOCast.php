@@ -15,8 +15,8 @@ class MoneyVOCast implements CastsAttributes
      */
     public function get(Model $model, string $key, mixed $value, array $attributes): MoneyVO
     {
-        $amount = $attributes['amount'] ?? 0;
-        $currency = $attributes['currency'] ?? 'RUB';  // По умолчанию рубли
+        $amount = $attributes['balance'] ?? 0;
+        $currency = $attributes['currency'] ?? 'RUB';
 
         return MoneyVO::create((float)$amount, $currency);
     }
@@ -34,7 +34,7 @@ class MoneyVOCast implements CastsAttributes
         }
 
         return [
-            'amount' => $value->getAmount(),
+            'balance' => $value->getAmount(),
             'currency' => $value->getCurrency(),
         ];
     }

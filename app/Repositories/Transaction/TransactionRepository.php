@@ -11,7 +11,11 @@ class TransactionRepository implements TransactionRepositoryInterface
 {
     public function save(Transaction $transaction): bool
     {
-        return $transaction->save();
+        if ($transaction->save()) {
+            $transaction->refresh();
+            return true;
+        }
+        return false;
     }
 
     public function find(int $id): ?Transaction
@@ -28,23 +32,19 @@ class TransactionRepository implements TransactionRepositoryInterface
     {
         $query = Transaction::query();
 
-        if(isset($filters['user_id']))
-        {
+        if (isset($filters['user_id'])) {
             $query->where('user_id', $filters['user_id']);
         }
 
-        if(isset($filters['type']))
-        {
+        if (isset($filters['type'])) {
             $query->where('type', $filters['type']);
         }
 
-        if(isset($filters['date_from']))
-        {
+        if (isset($filters['date_from'])) {
             $query->where('created_at', '>=', $filters['date_from']);
         }
 
-        if(isset($filters['date_to']))
-        {
+        if (isset($filters['date_to'])) {
             $query->where('created_at', '<=', $filters['date_to']);
         }
 

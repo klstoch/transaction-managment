@@ -146,4 +146,12 @@ class User extends Authenticatable
     {
         return $this->hasMany(Transaction::class);
     }
+
+    public function addTransaction(Transaction $transaction): self
+    {
+        $transaction->user()->associate($this);
+        $this->transactions()->save($transaction);
+
+        return $this;
+    }
 }

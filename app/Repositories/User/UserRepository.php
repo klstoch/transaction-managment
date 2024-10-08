@@ -13,12 +13,16 @@ class UserRepository implements UserRepositoryInterface
 
     public function save(User $user): bool
     {
-        return $user->save();
+        if ($user->save()) {
+            $user->refresh();
+            return true;
+        }
+        return false;
     }
 
     public function delete(int $id): bool
     {
-        return User::destroy($id)>0;
+        return User::destroy($id) > 0;
     }
 
     public function findById(int $id): ?User
