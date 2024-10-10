@@ -2,15 +2,19 @@
 
 declare(strict_types=1);
 
-
 namespace App\Http\Requests\Transaction;
+
+use Illuminate\Foundation\Http\FormRequest;
 
 /**
  * @property float $amount
  * @property string $currency
  */
-class WithdrawRequest
+class WithdrawRequest extends FormRequest
 {
+    /**
+     * @return string[]
+     */
     public function rules(): array
     {
         return [

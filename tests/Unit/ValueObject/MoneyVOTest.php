@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-
 namespace Tests\Unit\ValueObject;
 
 use App\ValueObject\MoneyVO;
@@ -13,7 +12,6 @@ use PHPUnit\Framework\TestCase;
 
 class MoneyVOTest extends TestCase
 {
-
     #[DataProvider('exchangeDataProvider')]
     public function testExchange(float $initialAmount, string $initialCurrency, string $toCurrency, float $expectedAmount): void
     {
@@ -30,7 +28,7 @@ class MoneyVOTest extends TestCase
      */
     public static function exchangeDataProvider(): array
     {
-        $config = require __DIR__ . '/../../../config/money.php';
+        $config = require __DIR__.'/../../../config/money.php';
         LibConfig::getInstance($config);
 
         return [
@@ -58,7 +56,7 @@ class MoneyVOTest extends TestCase
      */
     public static function addDataProvider(): array
     {
-        $config = require __DIR__ . '/../../../config/money.php';
+        $config = require __DIR__.'/../../../config/money.php';
         LibConfig::getInstance($config);
 
         return [
@@ -90,7 +88,7 @@ class MoneyVOTest extends TestCase
      */
     public static function subtractDataProvider(): array
     {
-        $config = require __DIR__ . '/../../../config/money.php';
+        $config = require __DIR__.'/../../../config/money.php';
         LibConfig::getInstance($config);
 
         return [
@@ -105,5 +103,4 @@ class MoneyVOTest extends TestCase
         ];
 
     }
-
 }

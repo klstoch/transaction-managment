@@ -13,8 +13,10 @@ class TransactionRepository implements TransactionRepositoryInterface
     {
         if ($transaction->save()) {
             $transaction->refresh();
+
             return true;
         }
+
         return false;
     }
 

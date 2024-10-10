@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-
 namespace Tests\Feature\Model;
 
 use App\Models\Transaction;
@@ -14,13 +13,12 @@ use Tests\TestCase;
 
 class TransactionTest extends TestCase
 {
-
     /**
      * @throws RequiredParameterMissedException
      */
     public function testMultipleTransactions(): void
     {
-        $config = require __DIR__ . '/../../../config/money.php';
+        $config = require __DIR__.'/../../../config/money.php';
         LibConfig::getInstance($config);
 
         $user = User::create(
@@ -59,6 +57,4 @@ class TransactionTest extends TestCase
             $this->assertEquals($expectedTypes[$index], $transaction->type->value);
         }
     }
-
-
 }

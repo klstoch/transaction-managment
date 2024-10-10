@@ -12,14 +12,11 @@ use Throwable;
 
 readonly class WithdrawService
 {
-
     public function __construct(
         private DbTransactionManagerService $dbTransactionManagerService,
-        private UserRepository              $userRepository,
-        private TransactionRepository       $transactionRepository,
-    )
-    {
-    }
+        private UserRepository $userRepository,
+        private TransactionRepository $transactionRepository,
+    ) {}
 
     /**
      * @throws Throwable

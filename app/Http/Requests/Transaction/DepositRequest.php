@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-
 namespace App\Http\Requests\Transaction;
 
 use Illuminate\Foundation\Http\FormRequest;
@@ -13,6 +12,9 @@ use Illuminate\Foundation\Http\FormRequest;
  */
 class DepositRequest extends FormRequest
 {
+    /**
+     * @return string[]
+     */
     public function rules(): array
     {
         return [
@@ -20,5 +22,4 @@ class DepositRequest extends FormRequest
             'currency' => 'required|string|in:RUB,USD,EUR',
         ];
     }
-
 }

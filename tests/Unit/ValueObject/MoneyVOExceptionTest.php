@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-
 namespace Tests\Unit\ValueObject;
 
 use App\ValueObject\MoneyVO;
@@ -16,7 +15,7 @@ class MoneyVOExceptionTest extends TestCase
     public function testCreateWithUnsupportedCurrency(string $currency): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage("Валюта '$currency' не поддерживается.");
+        $this->expectExceptionMessage("Currency '$currency' not supported.");
 
         MoneyVO::create(100, $currency);
     }
@@ -34,7 +33,7 @@ class MoneyVOExceptionTest extends TestCase
     public function testCreateWithNegativeAmount(float $amount): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage("Сумма должна быть не меньше 0");
+        $this->expectExceptionMessage('The amount must be at least 0.');
 
         MoneyVO::create($amount, 'RUB');
     }
@@ -53,9 +52,8 @@ class MoneyVOExceptionTest extends TestCase
         $money = MoneyVO::create(100, 'RUB');
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage("Валюта 'GBP' не поддерживается.");
+        $this->expectExceptionMessage("Currency 'GBP' not supported.");
 
         $money->exchange('GBP');
     }
-
 }

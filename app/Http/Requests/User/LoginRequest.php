@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-
 namespace App\Http\Requests\User;
 
 use Illuminate\Foundation\Http\FormRequest;
@@ -14,6 +13,9 @@ class LoginRequest extends FormRequest
         return true;
     }
 
+    /**
+     * @return string[]
+     */
     public function rules(): array
     {
         return [

@@ -13,12 +13,10 @@ use Throwable;
 readonly class DepositService
 {
     public function __construct(
-        private UserRepository              $userRepository,
+        private UserRepository $userRepository,
         private DbTransactionManagerService $dbTransactionManagerService,
-        private TransactionRepository       $transactionRepository,
-    )
-    {
-    }
+        private TransactionRepository $transactionRepository,
+    ) {}
 
     /**
      * @throws Throwable
@@ -40,5 +38,4 @@ readonly class DepositService
             throw $exception;
         }
     }
-
 }

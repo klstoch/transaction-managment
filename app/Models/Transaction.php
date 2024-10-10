@@ -10,13 +10,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-
 /**
  * @property int $user_id
  * @property TransactionType $type
  * @property float $amount
  * @property string $currency
- * @property int $recipient_id
+ * @property int|null $recipient_id
  */
 class Transaction extends Model
 {
@@ -27,19 +26,26 @@ class Transaction extends Model
         'type',
         'amount',
         'recipient_id',
-        'currency'
+        'currency',
     ];
 
+    /**
+     * @var array<string, string>
+     */
     protected $casts = [
         'type' => TransactionType::class,
     ];
 
     public static function createForDeposit(
-        User    $user,
+        User $user,
         MoneyVO $money,
-    ): self
-    {
-        $transaction = new Transaction();
+    ): self {
+
+        if (! $user->exists) {
+            $user->save();
+        }
+
+        $transaction = new Transaction;
         $transaction->type = TransactionType::DEPOSIT;
         $transaction->amount = $money->getAmount();
         $transaction->currency = $money->getCurrency();
@@ -51,11 +57,10 @@ class Transaction extends Model
     }
 
     public static function createForWithdraw(
-        User   $user,
+        User $user,
         MoneyVO $money,
-    ): self
-    {
-        $transaction = new Transaction();
+    ): self {
+        $transaction = new Transaction;
         $transaction->user_id = $user->id;
         $transaction->type = TransactionType::WITHDRAW;
         $transaction->amount = $money->getAmount();
@@ -68,12 +73,11 @@ class Transaction extends Model
     }
 
     public static function createForTransfer(
-        User    $sender,
+        User $sender,
         MoneyVO $money,
-        User    $recipient,
-    ): self
-    {
-        $transaction = new Transaction();
+        User $recipient,
+    ): self {
+        $transaction = new Transaction;
         $transaction->type = TransactionType::TRANSFER;
         $transaction->amount = $money->getAmount();
         $transaction->currency = $money->getCurrency();

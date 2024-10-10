@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-
 namespace App\Repositories\User;
 
 use App\Models\User;
@@ -16,9 +15,15 @@ interface UserRepositoryInterface
 
     public function findById(int $id): ?User;
 
-    public function all():Collection;
+    /**
+     * @return Collection<int, User>
+     */
+    public function all(): Collection;
 
     public function findByEmail(string $email): ?User;
 
+    /**
+     * @return Collection<int, User>
+     */
     public function filterByName(string $name): Collection;
 }

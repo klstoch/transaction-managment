@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-
 namespace App\ValueObject;
 
 use Chetkov\Money\Exception\MoneyException;
@@ -14,9 +13,7 @@ final readonly class MoneyVO
 
     private function __construct(
         private Money $money,
-    )
-    {
-    }
+    ) {}
 
     public static function create(float $amount, string $currency): self
     {
@@ -26,6 +23,7 @@ final readonly class MoneyVO
 
         return self::exceptionHandling(function () use ($amount, $currency) {
             $money = new Money($amount, $currency);
+
             return new self($money);
         });
     }
@@ -52,8 +50,10 @@ final readonly class MoneyVO
         return $this->exceptionHandling(function () use ($toCurrency) {
             if ($this->money->getCurrency() !== $toCurrency) {
                 $money = $this->money->exchange($toCurrency);
+
                 return self::createFromMoney($money);
             }
+
             return $this;
         });
     }
@@ -62,6 +62,7 @@ final readonly class MoneyVO
     {
         return $this->exceptionHandling(function () use ($other) {
             $money = $this->money->add($other->money);
+
             return self::createFromMoney($money);
         });
     }
@@ -71,6 +72,7 @@ final readonly class MoneyVO
 
         return $this->exceptionHandling(function () use ($other) {
             $money = $this->money->subtract($other->money);
+
             return self::createFromMoney($money);
         });
 
@@ -78,19 +80,19 @@ final readonly class MoneyVO
 
     private static function validateAmount(float $amount): void
     {
-        if ($amount < 0 ) {
-            throw new \InvalidArgumentException("Сумма должна быть не меньше 0");
+        if ($amount < 0) {
+            throw new \InvalidArgumentException('The amount must be at least 0.');
         }
     }
 
     private static function validateCurrency(string $currency): void
     {
-        if (!in_array($currency, self::SUPPORTED_CURRENCIES, true)) {
-            throw new \InvalidArgumentException("Валюта '$currency' не поддерживается.");
+        if (! in_array($currency, self::SUPPORTED_CURRENCIES, true)) {
+            throw new \InvalidArgumentException("Currency '$currency' not supported.");
         }
     }
 
-    private static function exceptionHandling(callable $callback): mixed
+    private static function exceptionHandling(callable $callback): self
     {
         try {
             return $callback();

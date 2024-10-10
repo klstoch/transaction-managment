@@ -6,12 +6,12 @@ namespace App\Models;
 
 use App\Casts\MoneyVOCast;
 use App\ValueObject\MoneyVO;
-use Illuminate\Support\Facades\Hash;
-use InvalidArgumentException;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Hash;
+use InvalidArgumentException;
 use Laravel\Sanctum\HasApiTokens;
 
 /**
@@ -24,7 +24,7 @@ use Laravel\Sanctum\HasApiTokens;
  */
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable, HasApiTokens;
+    use HasApiTokens, HasFactory, Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -49,6 +49,9 @@ class User extends Authenticatable
         'remember_token',
     ];
 
+    /**
+     * @var array<string, mixed>
+     */
     protected $attributes = [
         'balance' => 0,
         'currency' => 'RUB',
@@ -60,7 +63,7 @@ class User extends Authenticatable
         string $password,
         ?MoneyVO $initialBalance = null,
     ): self {
-        $user = new self();
+        $user = new self;
 
         $user->name = $name;
         $user->email = $email;
@@ -85,9 +88,10 @@ class User extends Authenticatable
 
     public function checkPassword(string $password): bool
     {
-        if (!Hash::check($password, $this->password)) {
-            throw new InvalidArgumentException('Неправильный пароль.');
+        if (! Hash::check($password, $this->password)) {
+            throw new InvalidArgumentException('Incorrect password.');
         }
+
         return true;
     }
 
@@ -97,6 +101,7 @@ class User extends Authenticatable
 
         $convertedMoney = $money->exchange($this->balance->getCurrency());
         $this->balance = $this->balance->add($convertedMoney);
+
         return Transaction::createForDeposit($this, $money);
     }
 
@@ -108,6 +113,7 @@ class User extends Authenticatable
         $convertedMoney = $money->exchange($this->balance->getCurrency());
 
         $this->balance = $this->balance->subtract($convertedMoney);
+
         return Transaction::createForWithdraw($this, $money);
     }
 
@@ -117,7 +123,7 @@ class User extends Authenticatable
         $this->validateBalance($money);
 
         if ($this->id === $recipient->id) {
-            throw new InvalidArgumentException('Нельзя перевести средства самому себе');
+            throw new InvalidArgumentException('You cannot transfer funds to yourself.');
         }
 
         $convertedSenderMoney = $money->exchange($this->balance->getCurrency());
@@ -138,7 +144,7 @@ class User extends Authenticatable
         $amount = $convertedMoney->getAmount();
 
         if ($amount < 1 || $amount > 100000) {
-            throw new InvalidArgumentException('Сумма должна быть от 1 до 100000 в RUB');
+            throw new InvalidArgumentException('The amount must be from 1 to 100,000 in RUB.');
         }
     }
 
@@ -147,7 +153,7 @@ class User extends Authenticatable
         $convertedMoney = $money->exchange($this->balance->getCurrency());
 
         if ($convertedMoney->getAmount() > $this->balance->getAmount()) {
-            throw new InvalidArgumentException('Недостаточно средств');
+            throw new InvalidArgumentException('Insufficient funds.');
         }
     }
 

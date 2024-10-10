@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-
 namespace Tests\Feature\Model;
 
 use App\Models\Transaction;
@@ -18,14 +17,13 @@ class UserTest extends TestCase
 {
     #[DataProvider('depositDataProvider')]
     public function testDeposit(
-        float   $initialBalance,
+        float $initialBalance,
         MoneyVO $money,
-        string  $expectedCurrency,
-        float   $expectedBalance,
-        float   $expectedTransactionAmount,
-        string  $expectedTransactionType,
-    ): void
-    {
+        string $expectedCurrency,
+        float $expectedBalance,
+        float $expectedTransactionAmount,
+        string $expectedTransactionType,
+    ): void {
         $user = User::create(
             'test',
             'test@test.com',
@@ -37,6 +35,7 @@ class UserTest extends TestCase
         if ($money->getAmount() < 1 || $money->getAmount() > 100000) {
             $this->expectException(InvalidArgumentException::class);
             $user->deposit($money);
+
             return;
         }
 
@@ -58,7 +57,7 @@ class UserTest extends TestCase
     public static function depositDataProvider(): array
     {
 
-        $config = require __DIR__ . '/../../../config/money.php';
+        $config = require __DIR__.'/../../../config/money.php';
         LibConfig::getInstance($config);
 
         return [
@@ -70,14 +69,13 @@ class UserTest extends TestCase
 
     #[DataProvider('withdrawDataProvider')]
     public function testWithdraw(
-        float   $initialBalance,
+        float $initialBalance,
         MoneyVO $money,
-        string  $expectedCurrency,
-        float   $expectedBalance,
-        float   $expectedTransactionAmount,
-        string  $expectedTransactionType,
-    ): void
-    {
+        string $expectedCurrency,
+        float $expectedBalance,
+        float $expectedTransactionAmount,
+        string $expectedTransactionType,
+    ): void {
 
         $user = User::create(
             'test',
@@ -90,6 +88,7 @@ class UserTest extends TestCase
         if ($money->getAmount() < 1 || $money->getAmount() > 100000 || $user->balance->getAmount() < $money->getAmount()) {
             $this->expectException(InvalidArgumentException::class);
             $user->withdraw($money);
+
             return;
         }
 
@@ -104,11 +103,12 @@ class UserTest extends TestCase
 
     /**
      * @return array[]
+     *
      * @throws RequiredParameterMissedException
      */
     public static function withdrawDataProvider(): array
     {
-        $config = require __DIR__ . '/../../../config/money.php';
+        $config = require __DIR__.'/../../../config/money.php';
         LibConfig::getInstance($config);
 
         return [
@@ -120,16 +120,15 @@ class UserTest extends TestCase
 
     #[DataProvider('transferDataProvider')]
     public function testTransfer(
-        float   $initialBalanceSender,
-        float   $initialBalanceRecipient,
+        float $initialBalanceSender,
+        float $initialBalanceRecipient,
         MoneyVO $transferAmount,
-        float   $expectedSenderBalance,
-        float   $expectedRecipientBalance,
-        string  $expectedTransactionCurrency,
-        float   $expectedTransactionAmount,
-        bool    $shouldThrowException = false
-    ): void
-    {
+        float $expectedSenderBalance,
+        float $expectedRecipientBalance,
+        string $expectedTransactionCurrency,
+        float $expectedTransactionAmount,
+        bool $shouldThrowException = false
+    ): void {
         $sender = User::create(
             'test',
             'test@test.com',
@@ -149,6 +148,7 @@ class UserTest extends TestCase
         if ($shouldThrowException) {
             $this->expectException(InvalidArgumentException::class);
             $sender->transfer($sender, $transferAmount);
+
             return;
         }
 
@@ -165,11 +165,12 @@ class UserTest extends TestCase
 
     /**
      * @return array[]
+     *
      * @throws RequiredParameterMissedException
      */
     public static function transferDataProvider(): array
     {
-        $config = require __DIR__ . '/../../../config/money.php';
+        $config = require __DIR__.'/../../../config/money.php';
         LibConfig::getInstance($config);
 
         return [
@@ -179,5 +180,4 @@ class UserTest extends TestCase
             'self_transfer' => [100, 100, MoneyVO::create(50, 'RUB'), 100, 100, 'RUB', 0, true],     // Попытка перевода самому себе
         ];
     }
-
 }

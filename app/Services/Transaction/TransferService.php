@@ -13,14 +13,11 @@ use Throwable;
 
 readonly class TransferService
 {
-
     public function __construct(
         private DbTransactionManagerService $dbTransactionManagerService,
-        private UserRepository              $userRepository,
-        private TransactionRepository       $transactionRepository,
-    )
-    {
-    }
+        private UserRepository $userRepository,
+        private TransactionRepository $transactionRepository,
+    ) {}
 
     /**
      * @throws Throwable
@@ -31,7 +28,7 @@ readonly class TransferService
 
         try {
             $recipient = $this->userRepository->findByEmail($recipientEmail);
-            if (!$recipient) {
+            if (! $recipient) {
                 throw new Exception('Получатель не найден');
             }
 
@@ -43,7 +40,6 @@ readonly class TransferService
             $this->transactionRepository->save($transaction);
 
             $this->dbTransactionManagerService->commit();
-
 
         } catch (Throwable $exception) {
             $this->dbTransactionManagerService->rollback();

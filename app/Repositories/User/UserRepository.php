@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-
 namespace App\Repositories\User;
 
 use App\Models\User;
@@ -14,8 +13,10 @@ class UserRepository implements UserRepositoryInterface
     {
         if ($user->save()) {
             $user->refresh();
+
             return true;
         }
+
         return false;
     }
 
