@@ -15,7 +15,7 @@ interface TransactionRepositoryInterface
 
     /**
      * @param  array<string, mixed>  $filters
-     * @return Collection<Transaction>
+     * @return Collection<int, Transaction>
      */
     public function filterBy(array $filters): Collection;
 

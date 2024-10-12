@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Requests\Transaction;
 
+use App\Models\User;
 use Illuminate\Foundation\Http\FormRequest;
 
 class TransactionFilterRequest extends FormRequest
@@ -25,11 +26,19 @@ class TransactionFilterRequest extends FormRequest
      */
     public function filters(): array
     {
+        $user = $this->user();
+
+        if ($user instanceof User) {
+            $userId = $user->id;
+        } else {
+            $userId = null;
+        }
+
         return array_filter([
             'type' => $this->input('type'),
             'from_date' => $this->input('from_date'),
             'to_date' => $this->input('to_date'),
-            'user_id' => $this->user()->id,
+            'user_id' => $userId,
         ]);
     }
 }

@@ -1,66 +1,172 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+### Для развертывания и тестирования приложения необходимо последовательно ввести в терминале следующие команды:
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+```bash
+./vendor/bin/sail up -d  #  запустить контейнера
+```
 
-## About Laravel
+```bash
+docker exec -it transaction-managment-laravel.test-1 bash   # команда для входа в контейнер
+```
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+```bash
+php artisan migrate  # выполнить миграции
+```
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+```bash
+php artisan test  # запустить тестирование
+```
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+```bash
+curl -X POST http://localhost/api/v1/register -H "Content-Type: application/json" -H "Accept: application/json" -d '{
+  "name": "Ivan Petrov",
+  "email": "ivan_petrov@example.com",
+  "password": "password12",
+  "password_confirmation": "password12"
+}'
+# запрос для регистрации пользователя
+```
 
-## Learning Laravel
+```bash
+curl -X POST http://localhost/api/v1/login -H "Content-Type: application/json" -H "Accept: application/json" -d '{
+  "email": "ivan_petrov@example.com",
+  "password": "password12" 
+}'
+# запрос для входа пользователя и создания токена
+```
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+```bash
+curl -X POST http://localhost/api/v1/deposit \
+-H "Authorization: Bearer Your_access_token" \
+-H "Content-Type: application/json" \
+-H "Accept: application/json" \
+-d '{
+    "amount": 3000,
+    "currency": "RUB"
+}'
+# запрос для ввода денежных средств
+```
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+```bash
+curl -X POST http://localhost/api/v1/withdraw \
+-H "Authorization: Bearer Your_access_token" \
+-H "Content-Type: application/json" \
+-H "Accept: application/json" \
+-d '{
+"amount": 1000,
+"currency": "RUB"
+}'
+# запрос для вывода денег
+```
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+```bash
+curl -X POST http://localhost/api/v1/transfer \
+-H "Authorization: Bearer Your_access_token" \
+-H "Content-Type: application/json" \
+-H "Accept: application/json" \
+-d '{
+"amount": 1000,
+"currency": "RUB",
+"recipient_email": "john@example.com"
+}'
+# запрос для перевода денег
+```
 
-## Laravel Sponsors
+```bash
+curl -X GET http://localhost/api/v1/transactions 
+-H "Authorization: Bearer Your_access_token" 
+-H "Accept: application/json"
+# запрос для получения всех транзакций
+```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+```bash
+curl -X GET http://localhost/api/v1/transactions \
+-H "Authorization: Bearer Your_access_token" \
+-H "Content-Type: application/json" \
+-H "Accept: application/json" \
+-G --data-urlencode "type=deposit" \
+--data-urlencode "from_date=2024-01-01" \
+--data-urlencode "to_date=2024-10-10" \
+--data-urlencode "user_id=1"
+# запрос для получения транзакций с использованием фильтров
+```
 
-### Premium Partners
+Приложение разработано опираясь на техническое задание, прикрепленное ниже.
+### "Разработка системы управления транзакциями и балансом пользователей"
+Описание:
+Требуется создать простую финансовую систему, которая позволит пользователям управлять своими балансами
+и совершать транзакции (пополнение счета, вывод средств и переводы между пользователями). 
+В качестве базы данных необходимо использовать PostgreSQL, а для реализации — Laravel.
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+Требования к функционалу:
 
-## Contributing
+Регистрация и авторизация пользователей:
+Пользователь должен иметь возможность зарегистрироваться с указанием:
+Имя
+Email
+Пароль
+Реализовать аутентификацию через API с использованием Laravel Sanctum или Laravel Passport.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Работа с балансом пользователя:
+У каждого пользователя должен быть баланс, который изначально равен 0.
+Пользователь может выполнять следующие действия:
+Пополнение баланса (например, через API-запрос).
+Вывод средств (с проверкой на наличие достаточного количества средств).
+Перевод средств другим пользователям.
 
-## Code of Conduct
+Транзакции:
+Каждое действие с балансом (пополнение, вывод средств, перевод) должно записываться в таблицу транзакций.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Каждая транзакция должна содержать:
+ - ID пользователя, который совершил действие.
+ - Тип транзакции: пополнение, вывод, перевод  
+ - Сумма транзакции
+ - Дата и время транзакции
+ - ID получателя (для переводов)
+ - Все транзакции должны быть атомарными (использовать транзакции базы данных в PostgreSQL).
 
-## Security Vulnerabilities
+Функционал перевода средств:
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Пользователь может перевести средства другому пользователю по его email.
+При переводе средства должны списываться с баланса отправителя и зачисляться на баланс получателя в одной транзакции.
+Баланс не может стать отрицательным (должна быть проверка перед списанием).
 
-## License
+Просмотр истории транзакций:
+Пользователь должен иметь возможность получить список всех своих транзакций с возможностью фильтрации по:
+Типу транзакции (пополнение, вывод, перевод)
+Периоду (дата с/по)
+Результаты должны быть отсортированы по дате (по умолчанию — от новых к старым).
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Ограничения:
+Баланс не может быть отрицательным после вывода или перевода.
+Максимальная сумма пополнения или вывода за одну операцию — 100,000 единиц.
+Минимальная сумма для любой операции — 1 единица.
+
+Технические требования:
+Laravel:
+Проект должен быть реализован на Laravel версии 11.
+Используйте PostgreSQL для работы с базой данных (использовать миграции для создания таблиц).
+
+Транзакции базы данных:
+Для перевода средств и операций пополнения/вывода необходимо использовать транзакции базы данных, чтобы гарантировать целостность данных.
+
+Валидация:
+Все операции должны проходить валидацию (например, проверка баланса перед выводом средств или переводом).
+При возникновении ошибок необходимо возвращать информативные сообщения с указанием причины (недостаточный баланс, неверные данные и т.д.).
+
+API:
+Все действия пользователя должны происходить через REST API.
+API должно возвращать стандартные коды ошибок и сообщений (200 — успешная операция, 400 — ошибка запроса и т.д.).
+
+Тестирование:
+Реализуйте unit-тесты и/или feature-тесты для проверки основных методов API: регистрация, пополнение, вывод, перевод, проверка истории транзакций.
+
+Дополнительные (необязательные) задачи:
+
+Обработка исключений:
+Реализовать обработку исключений для предотвращения возможных проблем при работе с базой данных или внешними сервисами.
+
+Валюты:
+Добавить поддержку нескольких валют для пользователей.
+Операции пополнения и перевода должны учитывать конвертацию валют с использованием фиксированных курсов
+
+[Laravel README is at this link](Laravel-README.md)

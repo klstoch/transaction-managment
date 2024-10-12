@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\User;
 
+use App\DTO\User\LoginDTO;
 use App\Models\User;
 use App\Repositories\User\UserRepository;
 use PHPUnit\Event\InvalidArgumentException;
@@ -12,18 +13,15 @@ readonly class AuthenticationService
 {
     public function __construct(private UserRepository $userRepository) {}
 
-    /**
-     * @param  array<string, mixed>  $data
-     */
-    public function login(array $data): string
+    public function login(LoginDTO $loginDTO): string
     {
-        $user = $this->userRepository->findByEmail($data['email']);
+        $user = $this->userRepository->findByEmail($loginDTO->email);
 
         if (! $user) {
             throw new InvalidArgumentException('Invalid login information');
         }
 
-        $user->checkPassword($data['password']);
+        $user->checkPassword($loginDTO->password);
 
         return $user->createToken('auth_token')->plainTextToken;
     }

@@ -29,7 +29,6 @@ class TransactionController extends Controller
         private readonly TransferService $transferService,
         private readonly AuthService $authService,
     ) {
-
         $this->user = $this->authService->getAuthenticatedUser();
     }
 
